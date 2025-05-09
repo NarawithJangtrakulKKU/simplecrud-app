@@ -264,7 +264,7 @@ export default function LandingPage() {
           <div className={`h-56 w-full relative sm:h-72 md:h-96 lg:w-full lg:h-full transition-all duration-1000 ${isLoaded ? 'opacity-100 transform-none' : 'opacity-0 translate-x-10'}`}>
             <img
               className="h-full w-full object-cover"
-              src="/api/placeholder/1000/800"
+              src="/pexels-madebymath-90946.jpg"
               alt="Featured product"
             />
             <div className="absolute inset-0 bg-black opacity-20"></div>
@@ -332,42 +332,44 @@ export default function LandingPage() {
             ))}
           </div>
           
-          {/* Products grid */}
-          <div className="mt-10 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-            {filteredProducts.map((product, index) => (
-              <div 
-                key={product.id} 
-                className={`group relative border rounded-lg p-4 min-h-[420px] flex flex-col transition-all duration-500 transform hover:shadow-lg ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="w-full aspect-[4/5] rounded-md overflow-hidden bg-gray-100 group-hover:opacity-75 flex items-center justify-center">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    style={{ aspectRatio: '4/5' }}
-                  />
-                </div>
-                <div className="mt-4 flex justify-between flex-1">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">
-                      <a href={`/product/${product.id}`}>
-                        <span aria-hidden="true" className="absolute inset-0" />
-                        {product.name}
-                      </a>
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">{product.description}</p>
-                  </div>
-                  <p className="text-lg font-semibold text-gray-900">${product.price}</p>
-                </div>
-                <button 
-                  className="mt-4 w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition-colors" 
-                  onClick={() => router.push(`/product/${product.id}`)}
+          {/* Products grid - horizontal scroll if more than 3 */}
+          <div className="mt-10">
+            <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar">
+              {filteredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`group relative border rounded-lg p-4 min-h-[420px] flex flex-col flex-shrink-0 w-[320px] transition-all duration-500 transform hover:shadow-lg ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
                 >
-                  View Details
-                </button>
-              </div>
-            ))}
+                  <div className="w-full aspect-[4/5] rounded-md overflow-hidden bg-gray-100 group-hover:opacity-75 flex items-center justify-center">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      style={{ aspectRatio: '4/5' }}
+                    />
+                  </div>
+                  <div className="mt-4 flex justify-between flex-1">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        <a href={`/product/${product.id}`}>
+                          <span aria-hidden="true" className="absolute inset-0" />
+                          {product.name}
+                        </a>
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">{product.description}</p>
+                    </div>
+                    <p className="text-lg font-semibold text-gray-900">${product.price}</p>
+                  </div>
+                  <button
+                    className="mt-4 w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition-colors"
+                    onClick={() => router.push(`/product/${product.id}`)}
+                  >
+                    View Details
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -482,3 +484,8 @@ export default function LandingPage() {
     </div>
   );
 }
+
+/* Add this CSS to hide the scrollbar (optional, for better UX):
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+*/
