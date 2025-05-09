@@ -100,7 +100,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
             {/* Logo หรือชื่อเว็บไซต์ */}
-            <Link href="/menu" className="font-bold text-xl text-black">
+            <Link href="/home" className="font-bold text-xl text-black">
               YourLogo
             </Link>
           </div>
