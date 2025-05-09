@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
@@ -7,6 +7,8 @@ import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
@@ -19,8 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          return request?.cookies?.token;
+          const token = request?.cookies?.token;
+          this.logger.debug(`Cookie token: ${token}`);
+          return token;
         },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
       secretOrKey: secret,
@@ -28,10 +33,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    this.logger.debug(`Validating payload: ${JSON.stringify(payload)}`);
     const user = await this.authService.validateUser(payload.sub);
     if (!user) {
+      this.logger.debug('User not found');
       throw new UnauthorizedException();
     }
+    this.logger.debug(`User found: ${JSON.stringify(user)}`);
     return user;
   }
 }

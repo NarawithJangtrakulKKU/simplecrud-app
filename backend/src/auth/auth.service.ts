@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Request } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -72,8 +72,12 @@ export class AuthService {
     }
 
     async validateUser(userId: string) {
-        return this.usersService.findByEmail(userId);
+        return this.usersService.findbyid(userId);
     }
     
+    async whoami(req: Request & { user: any }) {
+        const user = req.user;
+        return user;
+    }
     
 }

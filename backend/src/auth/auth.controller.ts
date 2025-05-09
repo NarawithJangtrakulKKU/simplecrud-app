@@ -49,12 +49,20 @@ export class AuthController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('whoami')
+  whoami(@User() user) {
+    return user;
+  }
+
   private setCookie(response: Response, token: string) {
     response.cookie('token', token, {
-      httpOnly: true, // ป้องกันการเข้าถึงจาก JavaScript
-      secure: process.env.NODE_ENV === 'production', // ใช้ HTTPS ในโหมด production
-      sameSite: 'strict', // ป้องกัน CSRF
-      maxAge: 7 * 24 * 60 * 60 * 1000, // หมดอายุใน 7 วัน
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+      domain: 'localhost'
     });
   }
 }

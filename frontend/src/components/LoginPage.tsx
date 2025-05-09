@@ -8,7 +8,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const route = useRouter()
+  const router = useRouter()
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,16 +23,18 @@ export default function AuthPage() {
       },{withCredentials: true})
 
       if(res){
-        route.push('/menu')
+        router.push('/menu')
       }
       
-      
-
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGuestAccess = () => {
+    router.push('/menu');
   };
 
   return (
@@ -110,6 +112,16 @@ export default function AuthPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          <div className="mt-4">
+            <button
+              onClick={handleGuestAccess}
+              type="button"
+              className="w-full cursor-pointer py-3 px-4 bg-white text-black font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            >
+              Continue as Guest
+            </button>
+          </div>
 
           <div className="mt-8 text-center">
             <p className="text-gray-600">

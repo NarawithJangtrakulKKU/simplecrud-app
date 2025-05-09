@@ -44,6 +44,9 @@ export class UsersService {
       },
     });
   }
+  async findAll() {
+    return this.prisma.user.findMany();
+  }
 
   async hashedPassword(password: string) {
     const saltRound = 10;
