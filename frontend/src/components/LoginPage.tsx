@@ -23,7 +23,7 @@ export default function AuthPage() {
       },{withCredentials: true})
 
       if(res){
-        router.push('/menu')
+        router.push('/home')
       }
       
     } catch (error) {

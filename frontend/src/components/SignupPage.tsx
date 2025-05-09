@@ -55,7 +55,7 @@ export default function SignupPage() {
       },{withCredentials: true})
 
       if(res){
-        route.push('/menu')
+        route.push('/home')
       }
       
       

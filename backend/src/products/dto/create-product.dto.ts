@@ -16,6 +16,10 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
+  @IsString()
+  image?: string;
+
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
