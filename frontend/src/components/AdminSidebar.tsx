@@ -1,7 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import axios from 'axios';
 import { 
   BarChart3, 
   Package, 
@@ -13,6 +14,17 @@ import {
   X
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 // ประเภทของรายการในเมนู
 interface SidebarItem {
@@ -27,13 +39,30 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ isMobile = false }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  // ฟังก์ชันสำหรับการออกจากระบบ
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await axios.post(`${apiUrl}/auth/logout`, {}, { withCredentials: true });
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      alert('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
   
   // รายการเมนู sidebar - สามารถเพิ่มได้ในอนาคต
   const sidebarItems: SidebarItem[] = [
     {
       title: 'Dashboard',
-      href: '/admin',
+      href: '/admin/dashboard',
       icon: <BarChart3 className="h-5 w-5" />
     },
     {
@@ -84,13 +113,34 @@ export default function AdminSidebar({ isMobile = false }: AdminSidebarProps) {
           </nav>
         </div>
         <div className="flex-shrink-0 flex border-t border-gray-700 p-4">
-          <Link
-            href="/logout"
-            className="flex-shrink-0 w-full group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            <span>Logout</span>
-          </Link>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                className="flex-shrink-0 w-full group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
+                <LogOut className="h-5 w-5 mr-3" />
+                <span>Logout</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Log Out</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to log out? Any unsaved changes will be lost.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="bg-black hover:bg-gray-800"
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Log out'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
@@ -134,14 +184,35 @@ export default function AdminSidebar({ isMobile = false }: AdminSidebarProps) {
               ))}
             </nav>
             <div className="flex-shrink-0 flex border-t border-gray-700 p-4">
-              <Link
-                href="/logout"
-                className="flex-shrink-0 w-full group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
-                onClick={() => setIsOpen(false)}
-              >
-                <LogOut className="h-5 w-5 mr-3" />
-                <span>Logout</span>
-              </Link>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    className="flex-shrink-0 w-full group flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <LogOut className="h-5 w-5 mr-3" />
+                    <span>Logout</span>
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Log Out</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to log out? Any unsaved changes will be lost.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleLogout}
+                      className="bg-black hover:bg-gray-800"
+                      disabled={isLoggingOut}
+                    >
+                      {isLoggingOut ? 'Logging out...' : 'Log out'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </SheetContent>
