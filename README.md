@@ -33,7 +33,7 @@
 ### 1. Clone โปรเจกต์นี้ลงเครื่อง
 
 ```bash
-git clone https://github.com/yourusername/simplecrud-app.git
+git clone https://github.com/NarawithJangtrakulKKU/simplecrud-app.git
 cd simplecrud-app
 ```
 
