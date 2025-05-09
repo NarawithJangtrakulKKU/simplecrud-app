@@ -48,6 +48,19 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
+  async update(id: string, data: any) {
+    return this.prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
+
   async hashedPassword(password: string) {
     const saltRound = 10;
     return bcrypt.hash(password, saltRound);
