@@ -55,7 +55,7 @@ export class ProductsController {
       ...body,
       price: Number(body.price),
       categoryId: Number(body.categoryId),
-      image: file ? `/images/products/${file.filename}` : undefined,
+      image: file ? `/images/products/${file.filename}` : (body.image || ''),
     };
     return this.productsService.create(createProductDto);
   }
@@ -94,7 +94,7 @@ export class ProductsController {
   @UseInterceptors(FileInterceptor('image', {
     storage: diskStorage({
       destination: (req, file, cb) => {
-        const uploadPath = path.join(process.cwd(), 'backend', 'public', 'images', 'products');
+        const uploadPath = path.join(process.cwd(), 'public', 'images', 'products');
         if (!fs.existsSync(uploadPath)) {
           fs.mkdirSync(uploadPath, { recursive: true });
         }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 // ประเภทของสินค้า
 interface Product {
@@ -24,10 +25,13 @@ interface Review {
 
 export default function LandingPage() {
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   
   // สถานะสำหรับการเคลื่อนไหวของ UI
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   // ข้อมูลจำลองสำหรับสินค้า
   const featuredProducts: Product[] = [
@@ -82,7 +86,7 @@ export default function LandingPage() {
   ];
 
   // ข้อมูลจำลองสำหรับหมวดหมู่
-  const categories = [
+  const categoriesData = [
     { id: 'all', name: 'All Products' },
     { id: 'electronics', name: 'Electronics' },
     { id: 'fashion', name: 'Fashion' },
@@ -155,15 +159,48 @@ export default function LandingPage() {
     }
   ];
 
-  // กรองสินค้าตามหมวดหมู่
-  const filteredProducts = activeCategory === 'all' 
-    ? featuredProducts 
-    : featuredProducts.filter(product => product.category === activeCategory);
-
   // เอฟเฟกต์การโหลดสำหรับการเคลื่อนไหว
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
+    // Fetch products and categories from backend
+    const fetchData = async () => {
+      try {
+        const [productsRes, categoriesRes] = await Promise.all([
+          axios.get(`${apiUrl}/products`),
+          axios.get(`${apiUrl}/categories`),
+        ]);
+        // Map products
+        const productsData: Product[] = (productsRes.data || []).map((p: any) => ({
+          id: p.id?.toString() || '',
+          name: p.name,
+          description: p.description,
+          price: p.price,
+          image: p.image ? `${apiUrl}${p.image}` : '/placeholder.png',
+          category: p.category?.name || '',
+        }));
+        setProducts(productsData);
+        // Map categories
+        let categoriesData: { id: string; name: string }[] = [];
+        if (Array.isArray(categoriesRes.data)) {
+          categoriesData = categoriesRes.data.map((c: any) => ({ id: c.name, name: c.name }));
+        } else if (categoriesRes.data && typeof categoriesRes.data === 'object') {
+          const categoriesArray = categoriesRes.data.items || categoriesRes.data.categories || [];
+          if (Array.isArray(categoriesArray)) {
+            categoriesData = categoriesArray.map((c: any) => ({ id: c.name, name: c.name }));
+          }
+        }
+        setCategories([{ id: 'all', name: 'All Products' }, ...categoriesData]);
+      } catch (err) {
+        // fallback: do nothing, products will be empty
+      }
+    };
+    fetchData();
+  }, [apiUrl]);
+
+  // กรองสินค้าตามหมวดหมู่
+  const filteredProducts = activeCategory === 'all'
+    ? products
+    : products.filter(product => product.category === activeCategory);
 
   // คอมโพเนนต์สำหรับแสดงดาว
   const StarRating = ({ rating }: { rating: number }) => {
@@ -300,17 +337,18 @@ export default function LandingPage() {
             {filteredProducts.map((product, index) => (
               <div 
                 key={product.id} 
-                className={`group relative border rounded-lg p-4 transition-all duration-500 transform hover:shadow-lg ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+                className={`group relative border rounded-lg p-4 min-h-[420px] flex flex-col transition-all duration-500 transform hover:shadow-lg ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
                 style={{ transitionDelay: `${index * 100}ms` }}
               >
-                <div className="w-full min-h-80 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75">
+                <div className="w-full aspect-[4/5] rounded-md overflow-hidden bg-gray-100 group-hover:opacity-75 flex items-center justify-center">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-center object-cover"
+                    className="w-full h-full object-cover"
+                    style={{ aspectRatio: '4/5' }}
                   />
                 </div>
-                <div className="mt-4 flex justify-between">
+                <div className="mt-4 flex justify-between flex-1">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">
                       <a href={`/product/${product.id}`}>

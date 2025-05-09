@@ -339,7 +339,7 @@ export default function AdminProductsPage() {
 
     try {
       setIsSubmitting(true);
-      await axios.delete(`${apiUrl}/products/${productToDelete.id}`);
+      await axios.delete(`${apiUrl}/products/${productToDelete.id}`, { withCredentials: true });
       
       // ลบสินค้าออกจากรายการ
       const updatedProducts = products.filter(product => product.id !== productToDelete.id);
